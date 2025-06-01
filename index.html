@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload and Display HTML File</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+      }
+      #upload-container {
+          margin-bottom: 20px;
+      }
+      #fileInput, #importSaveInput {
+          display: none;
+      }
+      #upload-label, #importSaveLabel, #exportSaveBtn, #googleSignInBtn, #manualSyncBtn {
+          padding: 10px 20px;
+          margin: 5px;
+          background: linear-gradient(to bottom, #00c6ff, #0072ff);
+          color: white;
+          border: none;
+          border-radius: 25px;
+          font-size: 16px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+      }
+      #upload-label:hover, #importSaveLabel:hover, #exportSaveBtn:hover, #googleSignInBtn:hover, #manualSyncBtn:hover {
+          background-color: #005bb5;
+      }
+      #fullscreen-button {
+          margin-top: 20px;
+          padding: 10px;
+          background: linear-gradient(to bottom, #00c6ff, #0072ff);
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+      }
+      #fullscreen-button:hover {
+          background-color: #005bb5;
+      }
+      #drive-status {
+          margin-top: 10px;
+          font-size: 14px;
+      }
+  </style>
+</head>
+<body>
+  <div id="upload-container">
+      <input type="file" id="fileInput" accept=".html">
+      <label for="fileInput" id="upload-label">upload html file</label>
+
+      <input type="file" id="importSaveInput" accept="application/json">
+      <label for="importSaveInput" id="importSaveLabel">import save</label>
+
+      <button id="exportSaveBtn">export save</button>
+      <button id="googleSignInBtn">sign in with google</button>
+      <button id="manualSyncBtn">force sync</button>
+      <div id="drive-status">⚠ sign in with google dummy</div>
+      <div id="last-saved">📁 last save: never</div>
+      <div id="last-restored">🔁 last restore: never</div>
+  </div>
+  <button id="fullscreen-button">open html file</button>
+
+  <script>
+    const CLIENT_ID = '690914589367-hhi5al9e37qgtlselc8gd3a418ctcd35.apps.googleusercontent.com';
+    let tokenClient, accessToken;
+    const statusEl = document.getElementById('drive-status');
+    const signInBtn = document.getElementById('googleSignInBtn');
+
+    function initializeGapi() {
+      gapi.load('client', async () => {
+        await gapi.client.init({
+          apiKey: '',
+          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
+        });
+
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email',
+          callback: async tokenResponse => {
+            accessToken = tokenResponse.access_token;
+            statusEl.textContent = '✅ signed in to google drive';
+            signInBtn.style.display = 'none';
+            await listAndRestoreSave();
+            setInterval(() => uploadToDrive(true), 60000); // autosave every minute
+          }
+        });
+      });
+    }
+
+    signInBtn.addEventListener('click', () => {
+      if (tokenClient) {
+        tokenClient.requestAccessToken();
+      } else {
+        alert('google client not ready');
+      }
+    });
+
+    async function listAndRestoreSave() {
+      try {
+        const res = await gapi.client.drive.files.list({
+          q: "name contains 'game_backup_'",
+          fields: "files(id, name, modifiedTime)"
+        });
+        const sorted = res.result.files.sort((a, b) => new Date(b.modifiedTime) - new Date(a.modifiedTime));
+        const latest = sorted[0];
+        if (latest) {
+          const content = await gapi.client.drive.files.get({ fileId: latest.id, alt: 'media' });
+          const data = content.result;
+          localStorage.setItem('gameSave', JSON.stringify(data.gameSave || {}));
+          localStorage.setItem('gameIndexedDB', JSON.stringify(data.gameIndexedDB || {}));
+          document.getElementById('last-restored').textContent = `🔁 last restore: ${new Date().toLocaleTimeString()}`;
+          alert('game save restored from drive');
+        }
+      } catch (e) {
+        console.error('restore failed', e);
+      }
+    }
+
+    async function uploadToDrive(isAuto = false) {
+      if (!accessToken) return;
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const metadata = {
+        name: `game_backup_${timestamp}.json`,
+        mimeType: "application/json"
+      };
+      const content = JSON.stringify({
+        gameSave: JSON.parse(localStorage.getItem('gameSave') || '{}'),
+        gameIndexedDB: JSON.parse(localStorage.getItem('gameIndexedDB') || '{}')
+      });
+      const boundary = '-------314159265358979323846';
+      const body = `--${boundary}
+Content-Type: application/json; charset=UTF-8
+
+${JSON.stringify(metadata)}
+--${boundary}
+Content-Type: application/json
+
+${content}
+--${boundary}--`;
+
+      await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': `multipart/related; boundary=${boundary}`
+        },
+        body
+      });
+
+      const timeStr = new Date().toLocaleTimeString();
+      statusEl.textContent = `✅ ${isAuto ? 'auto saved' : 'manual sync'} @ ${timeStr}`;
+      document.getElementById('last-saved').textContent = `📁 last save: ${timeStr}`;
+    }
+
+    window.onload = () => {
+      initializeGapi();
+    };
+
+    let uploadedHtmlContent = '';
+
+    document.getElementById('fileInput').addEventListener('change', async function (event) {
+      const file = event.target.files[0];
+      if (file && file.type === 'text/html') {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          uploadedHtmlContent = e.target.result;
+          alert('html file loaded you can now click open html file');
+        };
+        reader.readAsText(file);
+      } else {
+        alert('please upload a valid html file');
+      }
+    });
+
+    document.getElementById('fullscreen-button').addEventListener('click', function () {
+      if (!uploadedHtmlContent) {
+        alert('please upload an html file first');
+        return;
+      }
+      const blob = new Blob([uploadedHtmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    });
+  </script>
+</body>
+</html>
