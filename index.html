@@ -1,198 +1,347 @@
+<!--
+© 2024–2026 Arnav Somaghatta. All Rights Reserved.
+
+
+This HTML file and its associated code were created exclusively by Arnav Somaghatta. Any unauthorized claim of authorship or representation of this work as another individual’s own constitutes plagiarism.
+
+
+All rights, title, and interest in this code are reserved by Arnav Somaghatta. No part of this work may be copied, reproduced, modified, distributed, sold, or otherwise used without explicit prior written permission from the author.
+
+
+This software is provided “as is”, without warranty of any kind, express or implied. Use of this code is undertaken at the user’s own risk. Arnav Somaghatta shall not be held liable for any damages, losses, legal consequences, or disciplinary actions arising from the use or misuse of this code.
+
+
+This project is intended solely for educational and informational purposes. The author does not endorse or encourage the use of this software within schools, workplaces, or other restricted environments where such use may violate applicable policies or regulations.
+-->
+
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Upload and Display HTML File</title>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="https://apis.google.com/js/api.js"></script>
-  <style>
-      body {
-          font-family: Arial, sans-serif;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100vh;
-          margin: 0;
-      }
-      #upload-container {
-          margin-bottom: 20px;
-      }
-      #fileInput, #importSaveInput {
-          display: none;
-      }
-      #upload-label, #importSaveLabel, #exportSaveBtn, #googleSignInBtn, #manualSyncBtn {
-          padding: 10px 20px;
-          margin: 5px;
-          background: linear-gradient(to bottom, #00c6ff, #0072ff);
-          color: white;
-          border: none;
-          border-radius: 25px;
-          font-size: 16px;
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-      }
-      #upload-label:hover, #importSaveLabel:hover, #exportSaveBtn:hover, #googleSignInBtn:hover, #manualSyncBtn:hover {
-          background-color: #005bb5;
-      }
-      #fullscreen-button {
-          margin-top: 20px;
-          padding: 10px;
-          background: linear-gradient(to bottom, #00c6ff, #0072ff);
-          color: white;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-      }
-      #fullscreen-button:hover {
-          background-color: #005bb5;
-      }
-      #drive-status {
-          margin-top: 10px;
-          font-size: 14px;
-      }
-  </style>
-</head>
-<body>
-  <div id="upload-container">
-      <input type="file" id="fileInput" accept=".html">
-      <label for="fileInput" id="upload-label">upload html file</label>
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>cool buttons</title>
+   <style>
+     body {
+       font-family: Arial, sans-serif;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       justify-content: center;
+       height: 100vh;
+       margin: 0;
+     }
 
-      <input type="file" id="importSaveInput" accept="application/json">
-      <label for="importSaveInput" id="importSaveLabel">import save</label>
 
-      <button id="exportSaveBtn">export save</button>
-      <button id="googleSignInBtn">sign in with google</button>
-      <button id="manualSyncBtn">force sync</button>
-      <div id="drive-status">⚠ sign in with google dummy</div>
-      <div id="last-saved">📁 last save: never</div>
-      <div id="last-restored">🔁 last restore: never</div>
-  </div>
-  <button id="fullscreen-button">open html file</button>
+     #upload-container {
+       margin-bottom: 15px;
+     }
 
-  <script>
-    const CLIENT_ID = '690914589367-hhi5al9e37qgtlselc8gd3a418ctcd35.apps.googleusercontent.com';
-    let tokenClient, accessToken;
-    const statusEl = document.getElementById('drive-status');
-    const signInBtn = document.getElementById('googleSignInBtn');
 
-    function initializeGapi() {
-      gapi.load('client', async () => {
-        await gapi.client.init({
-          apiKey: '',
-          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
-        });
+     #fileInput {
+       display: none;
+     }
 
-        tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: CLIENT_ID,
-          scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email',
-          callback: async tokenResponse => {
-            accessToken = tokenResponse.access_token;
-            statusEl.textContent = '✅ signed in to google drive';
-            signInBtn.style.display = 'none';
-            await listAndRestoreSave();
-            setInterval(() => uploadToDrive(true), 60000); // autosave every minute
-          }
-        });
-      });
-    }
 
-    signInBtn.addEventListener('click', () => {
-      if (tokenClient) {
-        tokenClient.requestAccessToken();
-      } else {
-        alert('google client not ready');
-      }
-    });
+     #upload-label, #fullscreen-button, #rammerhead, #owner-site, #arnieproxy {
+       padding: 10px 20px;
+       margin: 5px;
+       background: #FF7700;
+       color: #0066FF;
+       border: none;
+       border-radius: 25px;
+       font-size: 16px;
+       cursor: pointer;
+       transition: background-color 0.6s ease;
+     }
 
-    async function listAndRestoreSave() {
-      try {
-        const res = await gapi.client.drive.files.list({
-          q: "name contains 'game_backup_'",
-          fields: "files(id, name, modifiedTime)"
-        });
-        const sorted = res.result.files.sort((a, b) => new Date(b.modifiedTime) - new Date(a.modifiedTime));
-        const latest = sorted[0];
-        if (latest) {
-          const content = await gapi.client.drive.files.get({ fileId: latest.id, alt: 'media' });
-          const data = content.result;
-          localStorage.setItem('gameSave', JSON.stringify(data.gameSave || {}));
-          localStorage.setItem('gameIndexedDB', JSON.stringify(data.gameIndexedDB || {}));
-          document.getElementById('last-restored').textContent = `🔁 last restore: ${new Date().toLocaleTimeString()}`;
-          alert('game save restored from drive');
-        }
-      } catch (e) {
-        console.error('restore failed', e);
-      }
-    }
 
-    async function uploadToDrive(isAuto = false) {
-      if (!accessToken) return;
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const metadata = {
-        name: `game_backup_${timestamp}.json`,
-        mimeType: "application/json"
-      };
-      const content = JSON.stringify({
-        gameSave: JSON.parse(localStorage.getItem('gameSave') || '{}'),
-        gameIndexedDB: JSON.parse(localStorage.getItem('gameIndexedDB') || '{}')
-      });
-      const boundary = '-------314159265358979323846';
-      const body = `--${boundary}
-Content-Type: application/json; charset=UTF-8
+     #mc-button {
+       padding: 10px 20px;
+       margin: 10px 0 0 0;
+       background: #FF7700;
+       color: #0066FF;
+       border: none;
+       border-radius: 25px;
+       font-size: 16px;
+       cursor: pointer;
+       transition: background-color 0.6s ease;
+     }
 
-${JSON.stringify(metadata)}
---${boundary}
-Content-Type: application/json
 
-${content}
---${boundary}--`;
+     #link {
+       font-size: 15px;
+       color: #666;
+       margin: -9px 0 9px;
+       text-align: center;
+       max-width: 450px;
+       cursor: copy;
+     }
 
-      await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + accessToken,
-          'Content-Type': `multipart/related; boundary=${boundary}`
-        },
-        body
-      });
 
-      const timeStr = new Date().toLocaleTimeString();
-      statusEl.textContent = `✅ ${isAuto ? 'auto saved' : 'manual sync'} @ ${timeStr}`;
-      document.getElementById('last-saved').textContent = `📁 last save: ${timeStr}`;
-    }
+     #legal {
+       padding: 10px 20px;
+       margin: 10px;
+       background: #FF7700;
+       color: #0066FF;
+       border: none;
+       border-radius: 25px;
+       font-size: 16px;
+       cursor: pointer;
+       transition: background-color 0.6s ease;
+     }
 
-    window.onload = () => {
-      initializeGapi();
-    };
 
-    let uploadedHtmlContent = '';
+     #copy-toast {
+       visibility: hidden;
+       min-width: 150px;
+       background-color: #333;
+       color: #fff;
+       text-align: center;
+       border-radius: 8px;
+       padding: 10px;
+       position: fixed;
+       z-index: 1000;
+       top: 20px;
+       left: 20px;
+       font-size: 14px;
+       opacity: 0;
+       transition: opacity 0.3s, visibility 0.3s;
+     }
 
-    document.getElementById('fileInput').addEventListener('change', async function (event) {
-      const file = event.target.files[0];
-      if (file && file.type === 'text/html') {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          uploadedHtmlContent = e.target.result;
-          alert('html file loaded you can now click open html file');
-        };
-        reader.readAsText(file);
-      } else {
-        alert('please upload a valid html file');
-      }
-    });
 
-    document.getElementById('fullscreen-button').addEventListener('click', function () {
-      if (!uploadedHtmlContent) {
-        alert('please upload an html file first');
-        return;
-      }
-      const blob = new Blob([uploadedHtmlContent], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-    });
-  </script>
-</body>
+   #copy-toast.show {
+     visibility: visible;
+     opacity: 1;
+   }
+
+
+     #upload-label:hover, #fullscreen-button:hover, #rammerhead:hover, #mc-button:hover, #owner-site:hover, #legal:hover, #arnieproxy:hover {
+       background-color: #0066FF;
+       color: #FF7700;
+     }
+   </style>
+ </head>
+ <body>
+   <div id="upload-container">
+     <input type="file" id="fileInput" accept=".html" />
+     <label for="fileInput" id="upload-label">upload html file</label>
+   </div>
+
+
+   <button id="fullscreen-button">open html file</button>
+   <button id="arnieproxy">open arnie proxy</button>
+   <button id="owner-site">open the creator's website!</button>
+   <button id="mc-button">open browser mc</button>
+
+
+   <p id="link-desc">
+   for browser mc open this link in the search bar:
+   </p>
+
+
+   <a href="#" id="link">
+   https://eaglercraft.ir/
+   </a>
+
+
+   <div id="copy-toast">Copied to clipboard!</div>
+
+
+
+
+   <button id="legal">legal note</button>
+
+
+   <div id="legal-notice" style="position: fixed; bottom: 5px; left: 5px; font-size: 10px; color: gray;">
+   © 2024–2026 Arnav Somaghatta. All Rights Reserved. View legal note above for more info.
+   </div>
+   <!--
+     !!! removal of the legal notice/legal button above is not permitted !!!
+   -->
+
+
+   <script>
+    
+     const savedContent = localStorage.getItem('gameBlobHtml');
+     let uploadedHtmlContent = savedContent || '';
+
+
+     document.getElementById('link').addEventListener('click', function (e) {
+     e.preventDefault();
+     const text = this.innerText.trim();
+     const toast = document.getElementById('copy-toast');
+
+
+     navigator.clipboard.writeText(text).then(() => {
+         toast.className = "show";
+        
+         setTimeout(() => {
+             toast.className = toast.className.replace("show", "");
+         }, 2000);
+     });
+ });
+
+
+     document.getElementById('fileInput').addEventListener('change', function (event) {
+         const file = event.target.files[0];
+         if (file && file.type === 'text/html') {
+             const reader = new FileReader();
+             reader.onload = function (e) {
+                 uploadedHtmlContent = e.target.result;
+                 localStorage.setItem('gameBlobHtml', uploadedHtmlContent);
+                 alert('HTML file saved locally and ready to launch');
+             };
+             reader.readAsText(file);
+         } else {
+             alert('Please upload a valid HTML file');
+         }
+     });
+
+
+     document.getElementById('fullscreen-button').addEventListener('click', function () {
+         if (!uploadedHtmlContent) {
+             alert('No HTML file uploaded');
+             return;
+         }
+
+
+         const newWindow = window.open('about:blank');
+         if (!newWindow) {
+             alert('Popup blocked');
+             return;
+         }
+
+
+         const newDocument = newWindow.document;
+         newDocument.open();
+         newDocument.write(`
+             <!DOCTYPE html>
+             <html>
+             <head>
+                 <title>New Tab</title>
+                 <style>
+                     html, body {
+                         margin: 0;
+                         padding: 0;
+                         width: 100%;
+                         height: 100%;
+                         overflow: hidden;
+                     }
+                     iframe {
+                         width: 100%;
+                         height: 100%;
+                         border: none;
+                     }
+                 </style>
+             </head>
+             <body>
+                 <iframe
+                     srcdoc="${uploadedHtmlContent
+                         .replace(/&/g, '&amp;')
+                         .replace(/</g, '&lt;')
+                         .replace(/>/g, '&gt;')
+                         .replace(/"/g, '&quot;')}">
+                     allow="fullscreen; gamepad; xr-spatial-tracking; pointer-lock"
+                     sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals"
+                 </iframe>
+             </body>
+             </html>
+         `);
+         newDocument.close();
+     });
+
+
+     document.getElementById('legal').addEventListener('click', function () {
+         alert("© 2024–2026 Arnav Somaghatta. All Rights Reserved.\n\nThis HTML file and its associated code were created exclusively by Arnav Somaghatta. Any unauthorized claim of authorship or representation of this work as another individual’s own constitutes plagiarism.\n\nAll rights, title, and interest in this code are reserved by Arnav Somaghatta. No part of this work may be copied, reproduced, modified, distributed, sold, or otherwise used without explicit prior written permission from the author.\n\nThis software is provided “as is”, without warranty of any kind, express or implied. Use of this code is undertaken at the user’s own risk. Arnav Somaghatta shall not be held liable for any damages, losses, legal consequences, or disciplinary actions arising from the use or misuse of this code.\n\nThis project is intended solely for educational and informational purposes. The author does not endorse or encourage the use of this software within schools, workplaces, or other restricted environments where such use may violate applicable policies or regulations.");
+     });
+     // removal of the button above is not permitted, if you remove it your plagiarizing arnie's hard work which makes you a rat :)
+
+
+     document.getElementById('owner-site').addEventListener('click', function () {
+         const newWindow = window.open('about:blank');
+         const newDocument = newWindow.document;
+         newDocument.write(`
+         <!DOCTYPE html>
+         <html>
+         <head>
+             <title>New Tab</title>
+             <style>
+                 html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
+                 iframe { width:100%; height:100%; border:none; }
+             </style>
+           </head>
+           <body>
+               <iframe src="https://arnav.somaghatta.com/" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+             </body>
+             </html>
+         `);
+         newDocument.close();
+     });
+
+
+     document.getElementById('arnieproxy').addEventListener('click', function () {
+         const newWindow = window.open('about:blank');
+         const newDocument = newWindow.document;
+         newDocument.write(`
+             <!DOCTYPE html>
+             <html>
+             <head>
+                 <title>New Tab</title>
+                 <style>
+                     html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
+                     iframe { width:100%; height:100%; border:none; }
+                 </style>
+             </head>
+             <body>
+                 <iframe src="https://proxy.somaghatta.com/"
+                 allow="fullscreen; gamepad; xr-spatial-tracking; pointer-lock"
+                 sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals"></iframe>
+             </body>
+             </html>
+         `);
+         newDocument.close();
+     });
+
+
+     document.getElementById('mc-button').addEventListener('click', function () {
+         const newWindow = window.open('about:blank');
+         const newDocument = newWindow.document;
+         newDocument.write(`
+             <!DOCTYPE html>
+             <html>
+             <head>
+                 <title>New Tab</title>
+                 <style>
+                     html, body {
+                         margin: 0;
+                         padding: 0;
+                         width: 100%;
+                         height: 100%;
+                         overflow: hidden;
+                     }
+                     iframe {
+                         position: absolute;
+                         top: -100px;
+                         left: 0;
+                         width: 100%;
+                         height: calc(100% + 100px);
+                         border: none;
+                     }
+                 </style>
+             </head>
+             <body>
+                 <iframe
+                     src="https://proxy.somaghatta.com/"
+                     allow="fullscreen; gamepad; xr-spatial-tracking; pointer-lock"
+                     sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals"></iframe>
+             </body>
+             </html>
+         `);
+         newDocument.close();
+     });
+
+
+   </script>
+ </body>
 </html>
