@@ -1,347 +1,349 @@
 <!--
 © 2024–2026 Arnav Somaghatta. All Rights Reserved.
 
-
 This HTML file and its associated code were created exclusively by Arnav Somaghatta. Any unauthorized claim of authorship or representation of this work as another individual’s own constitutes plagiarism.
-
 
 All rights, title, and interest in this code are reserved by Arnav Somaghatta. No part of this work may be copied, reproduced, modified, distributed, sold, or otherwise used without explicit prior written permission from the author.
 
-
 This software is provided “as is”, without warranty of any kind, express or implied. Use of this code is undertaken at the user’s own risk. Arnav Somaghatta shall not be held liable for any damages, losses, legal consequences, or disciplinary actions arising from the use or misuse of this code.
-
 
 This project is intended solely for educational and informational purposes. The author does not endorse or encourage the use of this software within schools, workplaces, or other restricted environments where such use may violate applicable policies or regulations.
 -->
 
-
 <!DOCTYPE html>
 <html lang="en">
- <head>
-   <meta charset="UTF-8" />
-   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <title>cool buttons</title>
-   <style>
-     body {
-       font-family: Arial, sans-serif;
-       display: flex;
-       flex-direction: column;
-       align-items: center;
-       justify-content: center;
-       height: 100vh;
-       margin: 0;
-     }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cool buttons</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+      }
 
+      #upload-container {
+        margin-bottom: 15px;
+      }
 
-     #upload-container {
-       margin-bottom: 15px;
-     }
+      #fileInput {
+        display: none;
+      }
 
+      #upload-label, #fullscreen-button, #owner-site, #arnieproxy {
+        padding: 10px 20px;
+        margin: 5px;
+        background: #FF7700;
+        color: #0066FF;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.6s ease;
+      }
 
-     #fileInput {
-       display: none;
-     }
+      #adminpanel {
+        position: fixed; 
+        bottom: 20px;
+        right: 20px;
+        background-color: #fffff;
+        color: grey;
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        font-size: 11px
+      }
 
+      #mc-button {
+        padding: 10px 20px;
+        margin: 10px 0 0 0;
+        background: #FF7700;
+        color: #0066FF;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.6s ease;
+      }
 
-     #upload-label, #fullscreen-button, #rammerhead, #owner-site, #arnieproxy {
-       padding: 10px 20px;
-       margin: 5px;
-       background: #FF7700;
-       color: #0066FF;
-       border: none;
-       border-radius: 25px;
-       font-size: 16px;
-       cursor: pointer;
-       transition: background-color 0.6s ease;
-     }
+      #link {
+        font-size: 15px;
+        color: #666;
+        margin: -9px 0 9px;
+        text-align: center;
+        max-width: 450px;
+        cursor: copy;
+      }
 
+      #legal {
+        padding: 10px 20px;
+        margin: 10px;
+        background: #FF7700;
+        color: #0066FF;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.6s ease;
+      }
 
-     #mc-button {
-       padding: 10px 20px;
-       margin: 10px 0 0 0;
-       background: #FF7700;
-       color: #0066FF;
-       border: none;
-       border-radius: 25px;
-       font-size: 16px;
-       cursor: pointer;
-       transition: background-color 0.6s ease;
-     }
+      #copy-toast {
+        visibility: hidden;
+        min-width: 150px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 8px;
+        padding: 10px;
+        position: fixed;
+        z-index: 1000;
+        top: 20px;
+        left: 20px;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.3s, visibility 0.3s;
+      }
 
+    #copy-toast.show {
+      visibility: visible;
+      opacity: 1;
+    }
 
-     #link {
-       font-size: 15px;
-       color: #666;
-       margin: -9px 0 9px;
-       text-align: center;
-       max-width: 450px;
-       cursor: copy;
-     }
+      #upload-label:hover, #fullscreen-button:hover, #mc-button:hover, #owner-site:hover, #legal:hover, #arnieproxy:hover {
+        background-color: #0066FF;
+        color: #FF7700;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="upload-container">
+      <input type="file" id="fileInput" accept=".html" />
+      <label for="fileInput" id="upload-label">upload html file</label>
+    </div>
 
+    <button id="fullscreen-button">open html file</button>
+    <button id="arnieproxy">open arnie proxy</button>
+    <button id="owner-site">open the creator's website!</button>
+    <button id="mc-button">open browser mc</button>
 
-     #legal {
-       padding: 10px 20px;
-       margin: 10px;
-       background: #FF7700;
-       color: #0066FF;
-       border: none;
-       border-radius: 25px;
-       font-size: 16px;
-       cursor: pointer;
-       transition: background-color 0.6s ease;
-     }
+    <p id="link-desc">
+    for browser mc open this link in the search bar:
+    </p>
 
+    <a href="#" id="link">
+    https://eaglercraft.ir/play/tf1.12.2wasm-beta/
+    </a>
 
-     #copy-toast {
-       visibility: hidden;
-       min-width: 150px;
-       background-color: #333;
-       color: #fff;
-       text-align: center;
-       border-radius: 8px;
-       padding: 10px;
-       position: fixed;
-       z-index: 1000;
-       top: 20px;
-       left: 20px;
-       font-size: 14px;
-       opacity: 0;
-       transition: opacity 0.3s, visibility 0.3s;
-     }
+    <div id="copy-toast">Copied to clipboard!</div>
 
+    <button id="adminpanel">admin panel</button>
 
-   #copy-toast.show {
-     visibility: visible;
-     opacity: 1;
-   }
+    <button id="legal">legal note</button>
 
+    <div id="legal-notice" style="position: fixed; bottom: 5px; left: 5px; font-size: 10px; color: gray;">
+    © 2024–2026 Arnav Somaghatta. All Rights Reserved. View legal note above for more info.
+    </div>
+    <!-- 
+      !!! removal of the legal notice/legal button above is not permitted !!!
+    -->
 
-     #upload-label:hover, #fullscreen-button:hover, #rammerhead:hover, #mc-button:hover, #owner-site:hover, #legal:hover, #arnieproxy:hover {
-       background-color: #0066FF;
-       color: #FF7700;
-     }
-   </style>
- </head>
- <body>
-   <div id="upload-container">
-     <input type="file" id="fileInput" accept=".html" />
-     <label for="fileInput" id="upload-label">upload html file</label>
-   </div>
+    <script>
+      
+      const savedContent = localStorage.getItem('gameBlobHtml');
+      let uploadedHtmlContent = savedContent || '';
 
+      document.getElementById('link').addEventListener('click', function (e) {
+      e.preventDefault();
+      const text = this.innerText.trim();
+      const toast = document.getElementById('copy-toast');
 
-   <button id="fullscreen-button">open html file</button>
-   <button id="arnieproxy">open arnie proxy</button>
-   <button id="owner-site">open the creator's website!</button>
-   <button id="mc-button">open browser mc</button>
+      navigator.clipboard.writeText(text).then(() => {
+          toast.className = "show";
+          
+          setTimeout(() => { 
+              toast.className = toast.className.replace("show", ""); 
+          }, 2000);
+      });
+  });
 
+      document.getElementById('fileInput').addEventListener('change', function (event) {
+          const file = event.target.files[0];
+          if (file && file.type === 'text/html') {
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                  uploadedHtmlContent = e.target.result;
+                  localStorage.setItem('gameBlobHtml', uploadedHtmlContent);
+                  alert('HTML file saved locally and ready to launch');
+              };
+              reader.readAsText(file);
+          } else {
+              alert('Please upload a valid HTML file');
+          }
+      });
 
-   <p id="link-desc">
-   for browser mc open this link in the search bar:
-   </p>
+      document.getElementById('fullscreen-button').addEventListener('click', function () {
+          if (!uploadedHtmlContent) {
+              alert('No HTML file uploaded');
+              return;
+          }
 
+          const newWindow = window.open('about:blank');
+          if (!newWindow) {
+              alert('Popup blocked');
+              return;
+          }
 
-   <a href="#" id="link">
-   https://eaglercraft.ir/
-   </a>
+          const newDocument = newWindow.document;
+          newDocument.open();
+          newDocument.write(`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                  <title>New Tab</title>
+                  <style>
+                      html, body {
+                          margin: 0;
+                          padding: 0;
+                          width: 100%;
+                          height: 100%;
+                          overflow: hidden;
+                      }
+                      iframe {
+                          width: 100%;
+                          height: 100%;
+                          border: none;
+                      }
+                  </style>
+              </head>
+              <body>
+                  <iframe
+                      srcdoc="${uploadedHtmlContent
+                          .replace(/&/g, '&amp;')
+                          .replace(/</g, '&lt;')
+                          .replace(/>/g, '&gt;')
+                          .replace(/"/g, '&quot;')}">
+                      allow="fullscreen; gamepad; xr-spatial-tracking; pointer-lock"
+                      sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals"
+                  </iframe>
+              </body>
+              </html>
+          `);
+          newDocument.close();
+      });
 
+      document.getElementById('legal').addEventListener('click', function () {
+          alert("© 2024–2026 Arnav Somaghatta. All Rights Reserved.\n\nThis HTML file and its associated code were created exclusively by Arnav Somaghatta. Any unauthorized claim of authorship or representation of this work as another individual’s own constitutes plagiarism.\n\nAll rights, title, and interest in this code are reserved by Arnav Somaghatta. No part of this work may be copied, reproduced, modified, distributed, sold, or otherwise used without explicit prior written permission from the author.\n\nThis software is provided “as is”, without warranty of any kind, express or implied. Use of this code is undertaken at the user’s own risk. Arnav Somaghatta shall not be held liable for any damages, losses, legal consequences, or disciplinary actions arising from the use or misuse of this code.\n\nThis project is intended solely for educational and informational purposes. The author does not endorse or encourage the use of this software within schools, workplaces, or other restricted environments where such use may violate applicable policies or regulations.");
+      });
+      // removal of the button above is not permitted, if you remove it your plagiarizing arnie's hard work which makes you a rat :) 
 
-   <div id="copy-toast">Copied to clipboard!</div>
+      document.getElementById('owner-site').addEventListener('click', function () {
+          const newWindow = window.open('about:blank');
+          const newDocument = newWindow.document;
+          newDocument.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>New Tab</title>
+              <style>
+                  html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
+                  iframe { width:100%; height:100%; border:none; }
+              </style>
+            </head>
+            <body>
+                <iframe src="https://arnav.somaghatta.com/" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+              </body>
+              </html>
+          `);
+          newDocument.close();
+      });
 
+      document.getElementById('arnieproxy').addEventListener('click', function () {
+          const newWindow = window.open('about:blank');
+          const newDocument = newWindow.document;
+          newDocument.write(`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                  <title>New Tab</title>
+                  <style>
+                      html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
+                      iframe { width:100%; height:100%; border:none; }
+                  </style>
+              </head>
+              <body>
+                  <iframe src="https://proxy.somaghatta.com"
+                  allow="fullscreen; gamepad; xr-spatial-tracking; pointer-lock"
+                  sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals"></iframe>
+              </body>
+              </html>
+          `);
+          newDocument.close();
+      });
 
+      document.getElementById('adminpanel').addEventListener('click', function () {
+          const newWindow = window.open('about:blank');
+          const newDocument = newWindow.document;
+          newDocument.write(`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                  <title>New Tab</title>
+                  <style>
+                      html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
+                      iframe { width:100%; height:100%; border:none; }
+                  </style>
+              </head>
+              <body>
+                  <iframe src="https://panel.somaghatta.com/" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+              </body>
+              </html>
+          `);
+          newDocument.close();
+      });
 
+      document.getElementById('mc-button').addEventListener('click', function () {
+          const newWindow = window.open('about:blank');
+          const newDocument = newWindow.document;
+          newDocument.write(`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                  <title>New Tab</title>
+                  <style>
+                      html, body {
+                          margin: 0;
+                          padding: 0;
+                          width: 100%;
+                          height: 100%;
+                          overflow: hidden;
+                      }
+                      iframe {
+                          position: absolute;
+                          top: -100px;
+                          left: 0;
+                          width: 100%;
+                          height: calc(100% + 100px);
+                          border: none;
+                      }
+                  </style>
+              </head>
+              <body>
+                  <iframe
+                      src="https://proxy.somaghatta.com/"
+                      allow="fullscreen; gamepad; xr-spatial-tracking; pointer-lock"
+                      sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals"></iframe>
+              </body>
+              </html>
+          `);
+          newDocument.close();
+      });
 
-   <button id="legal">legal note</button>
-
-
-   <div id="legal-notice" style="position: fixed; bottom: 5px; left: 5px; font-size: 10px; color: gray;">
-   © 2024–2026 Arnav Somaghatta. All Rights Reserved. View legal note above for more info.
-   </div>
-   <!--
-     !!! removal of the legal notice/legal button above is not permitted !!!
-   -->
-
-
-   <script>
-    
-     const savedContent = localStorage.getItem('gameBlobHtml');
-     let uploadedHtmlContent = savedContent || '';
-
-
-     document.getElementById('link').addEventListener('click', function (e) {
-     e.preventDefault();
-     const text = this.innerText.trim();
-     const toast = document.getElementById('copy-toast');
-
-
-     navigator.clipboard.writeText(text).then(() => {
-         toast.className = "show";
-        
-         setTimeout(() => {
-             toast.className = toast.className.replace("show", "");
-         }, 2000);
-     });
- });
-
-
-     document.getElementById('fileInput').addEventListener('change', function (event) {
-         const file = event.target.files[0];
-         if (file && file.type === 'text/html') {
-             const reader = new FileReader();
-             reader.onload = function (e) {
-                 uploadedHtmlContent = e.target.result;
-                 localStorage.setItem('gameBlobHtml', uploadedHtmlContent);
-                 alert('HTML file saved locally and ready to launch');
-             };
-             reader.readAsText(file);
-         } else {
-             alert('Please upload a valid HTML file');
-         }
-     });
-
-
-     document.getElementById('fullscreen-button').addEventListener('click', function () {
-         if (!uploadedHtmlContent) {
-             alert('No HTML file uploaded');
-             return;
-         }
-
-
-         const newWindow = window.open('about:blank');
-         if (!newWindow) {
-             alert('Popup blocked');
-             return;
-         }
-
-
-         const newDocument = newWindow.document;
-         newDocument.open();
-         newDocument.write(`
-             <!DOCTYPE html>
-             <html>
-             <head>
-                 <title>New Tab</title>
-                 <style>
-                     html, body {
-                         margin: 0;
-                         padding: 0;
-                         width: 100%;
-                         height: 100%;
-                         overflow: hidden;
-                     }
-                     iframe {
-                         width: 100%;
-                         height: 100%;
-                         border: none;
-                     }
-                 </style>
-             </head>
-             <body>
-                 <iframe
-                     srcdoc="${uploadedHtmlContent
-                         .replace(/&/g, '&amp;')
-                         .replace(/</g, '&lt;')
-                         .replace(/>/g, '&gt;')
-                         .replace(/"/g, '&quot;')}">
-                     allow="fullscreen; gamepad; xr-spatial-tracking; pointer-lock"
-                     sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals"
-                 </iframe>
-             </body>
-             </html>
-         `);
-         newDocument.close();
-     });
-
-
-     document.getElementById('legal').addEventListener('click', function () {
-         alert("© 2024–2026 Arnav Somaghatta. All Rights Reserved.\n\nThis HTML file and its associated code were created exclusively by Arnav Somaghatta. Any unauthorized claim of authorship or representation of this work as another individual’s own constitutes plagiarism.\n\nAll rights, title, and interest in this code are reserved by Arnav Somaghatta. No part of this work may be copied, reproduced, modified, distributed, sold, or otherwise used without explicit prior written permission from the author.\n\nThis software is provided “as is”, without warranty of any kind, express or implied. Use of this code is undertaken at the user’s own risk. Arnav Somaghatta shall not be held liable for any damages, losses, legal consequences, or disciplinary actions arising from the use or misuse of this code.\n\nThis project is intended solely for educational and informational purposes. The author does not endorse or encourage the use of this software within schools, workplaces, or other restricted environments where such use may violate applicable policies or regulations.");
-     });
-     // removal of the button above is not permitted, if you remove it your plagiarizing arnie's hard work which makes you a rat :)
-
-
-     document.getElementById('owner-site').addEventListener('click', function () {
-         const newWindow = window.open('about:blank');
-         const newDocument = newWindow.document;
-         newDocument.write(`
-         <!DOCTYPE html>
-         <html>
-         <head>
-             <title>New Tab</title>
-             <style>
-                 html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
-                 iframe { width:100%; height:100%; border:none; }
-             </style>
-           </head>
-           <body>
-               <iframe src="https://arnav.somaghatta.com/" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
-             </body>
-             </html>
-         `);
-         newDocument.close();
-     });
-
-
-     document.getElementById('arnieproxy').addEventListener('click', function () {
-         const newWindow = window.open('about:blank');
-         const newDocument = newWindow.document;
-         newDocument.write(`
-             <!DOCTYPE html>
-             <html>
-             <head>
-                 <title>New Tab</title>
-                 <style>
-                     html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
-                     iframe { width:100%; height:100%; border:none; }
-                 </style>
-             </head>
-             <body>
-                 <iframe src="https://proxy.somaghatta.com/"
-                 allow="fullscreen; gamepad; xr-spatial-tracking; pointer-lock"
-                 sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals"></iframe>
-             </body>
-             </html>
-         `);
-         newDocument.close();
-     });
-
-
-     document.getElementById('mc-button').addEventListener('click', function () {
-         const newWindow = window.open('about:blank');
-         const newDocument = newWindow.document;
-         newDocument.write(`
-             <!DOCTYPE html>
-             <html>
-             <head>
-                 <title>New Tab</title>
-                 <style>
-                     html, body {
-                         margin: 0;
-                         padding: 0;
-                         width: 100%;
-                         height: 100%;
-                         overflow: hidden;
-                     }
-                     iframe {
-                         position: absolute;
-                         top: -100px;
-                         left: 0;
-                         width: 100%;
-                         height: calc(100% + 100px);
-                         border: none;
-                     }
-                 </style>
-             </head>
-             <body>
-                 <iframe
-                     src="https://proxy.somaghatta.com/"
-                     allow="fullscreen; gamepad; xr-spatial-tracking; pointer-lock"
-                     sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals"></iframe>
-             </body>
-             </html>
-         `);
-         newDocument.close();
-     });
-
-
-   </script>
- </body>
+    </script>
+  </body>
 </html>
